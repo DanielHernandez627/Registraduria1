@@ -7,7 +7,13 @@ import com.arq.registraduria.entidades.TipoDocumento;
 import com.arq.registraduria.utilidades.Utilidades;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.time.Period;
 
 @SpringBootApplication
 public class RegistraduriaApplication {
@@ -23,8 +29,9 @@ public class RegistraduriaApplication {
 	static Persona persona = new Persona();
 	static ctlTDocumento tdocumento = new ctlTDocumento();
 
+	static SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 
 		Scanner sc = new Scanner(System.in);
 
@@ -66,8 +73,6 @@ public class RegistraduriaApplication {
 		ctlPersona cPersona = new ctlPersona();
 		Utilidades utilidades = new Utilidades();
 		Scanner sc1 = new Scanner(System.in);
-
-		int id_documento;
 
 		System.out.println("Digite el primer nombre: ");
 		persona.setPrimerNombre(sc1.nextLine());
@@ -115,13 +120,15 @@ public class RegistraduriaApplication {
 		return ind;
 	}
 
-	public static void actualizarDocumento() {
+	public static void actualizarDocumento() throws ParseException {
+
+		LocalDate fechaActual = LocalDate.now();
 
 		ctlPersona cPersona = new ctlPersona();
 		Scanner sc2 = new Scanner(System.in);
 
 		long numero_documento;
-		int opcion_actualizacion,id_documento_nuevo;
+		int opcion_actualizacion,id_documento_nuevo = 0;
 
 
 		System.out.println("Digite el numero de documetno de la persona a editar: ");
@@ -130,6 +137,12 @@ public class RegistraduriaApplication {
 		Persona persona1 = cPersona.getPersonaByDocumento(numero_documento);
 
 		if (persona1 != null){
+			Date fecha = formatoFecha.parse(persona1.getFecha_Nacimiento());
+			LocalDate fechaLocal = fecha.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+			Period periodo = Period.between(fechaLocal, fechaActual);
+
+			int aniosTranscurridos = periodo.getYears();
+
 			TipoDocumento documento = documentoEspecifico(persona1.getIdTipoDocumento());
 			if (documento != null){
 				System.out.println("Persona a editar: " + persona1.getNumero_documento());
@@ -148,16 +161,36 @@ public class RegistraduriaApplication {
 					System.out.println("**** Recuerde para cambiar el tipo de documento a Tarjeta de identidad debe tener 12 años ****");
 					System.out.println("**** Recuerde para cambiar el tipo de documento a Cedula de ciudadania debe tener 18 años **** \n");
 
-					System.out.println("Seleccione el nuevo documento: ");
-					for (TipoDocumento documento1 : tdocumento.GetDocumentos()) {
-						System.out.println(documento.getId() + ". " + documento1.getNombre());
+					while (id_documento_nuevo == 0) {
+						System.out.println("Seleccione el nuevo documento: ");
+
+						for (TipoDocumento documento1 : tdocumento.GetDocumentos()) {
+							System.out.println(documento1.getId() + ". " + documento1.getNombre());
+						}
+
+						System.out.println("\nSeleccione el número del nuevo documento a asignar: ");
+						id_documento_nuevo = sc2.nextInt();
+
+						if (id_documento_nuevo < 1 || id_documento_nuevo > 3) {
+							id_documento_nuevo = 0;
+							System.out.println("Seleccione un documento válido");
+						} else {
+							persona1.setIdTipoDocumento(id_documento_nuevo);
+						}
 					}
-					System.out.println("\n");
 
-					System.out.println("Seleccione el numero del nuevo documetno a asignar: ");
-					id_documento_nuevo = sc2.nextInt();
+					if (persona1.getIdTipoDocumento() == 1 && aniosTranscurridos > 7) {
+						System.out.println("La edad no coincide con el rango aplicable para este tipo de documento REGISTRO CIVIL");
+					} else if (persona1.getIdTipoDocumento() == 2 && (aniosTranscurridos < 7 || aniosTranscurridos > 17)) {
+						System.out.println("La edad actual no es válida para este tipo de documento TARJETA DE IDENTIDAD");
+					} else if (persona1.getIdTipoDocumento() == 3 && aniosTranscurridos < 18) {
+						System.out.println("La edad actual no es válida para este tipo de documento CÉDULA");
+					}else{
+						System.out.println("Actualizando documento...");
+						cPersona.savePersona(persona1);
+						System.out.println("Actualizacion exitosa");
+					}
 
-					System.out.println("Actualizando documento...");
 				}else{
 					System.out.println("Informacion errornea \nretornando al menu principal \n");
 				}
@@ -170,11 +203,6 @@ public class RegistraduriaApplication {
 		}
 	}
 
-	public static void buscarPersona() {
-		System.out.println("Buscando persona por documento...");
-		// Aquí puedes implementar la lógica para buscar una persona por documento
-	}
-
 	public static TipoDocumento documentoEspecifico(long id){
 		for (TipoDocumento documento : tdocumento.GetDocumentos()) {
 			if (documento.getId() == id){
@@ -183,5 +211,31 @@ public class RegistraduriaApplication {
 		}
 		return  null;
 	}
+
+	public static void buscarPersona() {
+		ctlPersona cPersona = new ctlPersona();
+
+		System.out.println("Personas Registradas \n");
+
+		List<Persona> personaList = cPersona.getAllPersonas();
+
+		for (Persona persona1 : personaList){
+			System.out.println("*****************************************************");
+			System.out.println("Numero de documento: "+ persona1.getNumero_documento());
+			System.out.println("Nombre: "+ persona1.getPrimerNombre() + " "
+					+ persona1.getSegundoNombre()+ " "
+					+ persona1.getPrimerApellido() + " " + persona1.getSegundoApellido());
+			System.out.println("Fecha de nacimiento: "+ persona1.getFecha_Nacimiento());
+
+			TipoDocumento documento = documentoEspecifico(persona1.getIdTipoDocumento());
+
+            assert documento != null;
+            System.out.println("Tipo de documento: "+ documento.getId() + "." + documento.getNombre());
+			System.out.println("*****************************************************");
+
+		}
+	}
+
+
 
 }

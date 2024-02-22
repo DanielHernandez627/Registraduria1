@@ -19,15 +19,17 @@ public class servicioPersona implements RepositorioPersona, Serializable {
     Utilidades utilidades = new Utilidades();
     List<Persona> personaList = new ArrayList<>();
 
+    String nombreArchivo = "Personas";
+
     @Override
     public void SavePersona(Persona persona) {
         String personaS = persona.toString();
-        utilidades.generarArchivo("Personas",personaS);
+        Utilidades.generarArchivo(nombreArchivo,personaS);
     }
 
     @Override
     public Persona getPersonaByDocumento(long numero_documento) {
-        personaList = convertirRespuesta(utilidades.leerArchivo("Personas"));
+        personaList = convertirRespuesta(utilidades.leerArchivo(nombreArchivo));
 
         for (Persona lista : personaList){
             if (lista.getNumero_documento() == numero_documento){
@@ -36,6 +38,11 @@ public class servicioPersona implements RepositorioPersona, Serializable {
         }
 
         return null;
+    }
+
+    @Override
+    public List<Persona> getAllPersona() {
+        return convertirRespuesta(utilidades.leerArchivo(nombreArchivo));
     }
 
     public static List<Persona> convertirRespuesta(String respuesta) {

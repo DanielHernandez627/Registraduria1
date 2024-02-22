@@ -5,6 +5,8 @@ import com.arq.registraduria.servicios.servicioPersona;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 public class ctlPersona {
@@ -16,6 +18,10 @@ public class ctlPersona {
 
     public Persona getPersonaByDocumento(long numero_documento){
         return spersona.getPersonaByDocumento(numero_documento);
+    }
+
+    public List<Persona> getAllPersonas(){
+        return spersona.getAllPersona();
     }
 
 }
