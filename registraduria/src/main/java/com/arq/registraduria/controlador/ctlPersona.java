@@ -16,12 +16,12 @@ public class ctlPersona {
         spersona.SavePersona(persona);
     }
 
-    public Persona getPersonaByDocumento(long numero_documento){
+   /* public Persona getPersonaByDocumento(long numero_documento){
         return spersona.getPersonaByDocumento(numero_documento);
     }
 
     public List<Persona> getAllPersonas(){
         return spersona.getAllPersona();
-    }
+    }*/
 
 }

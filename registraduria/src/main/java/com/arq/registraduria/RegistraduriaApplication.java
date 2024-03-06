@@ -4,8 +4,14 @@ import com.arq.registraduria.controlador.ctlPersona;
 import com.arq.registraduria.controlador.ctlTDocumento;
 import com.arq.registraduria.entidades.Persona;
 import com.arq.registraduria.entidades.TipoDocumento;
+import com.arq.registraduria.repositorios.RepositorioPersona;
 import com.arq.registraduria.utilidades.Utilidades;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -16,7 +22,7 @@ import java.util.Date;
 import java.time.Period;
 
 @SpringBootApplication
-public class RegistraduriaApplication {
+public class RegistraduriaApplication implements CommandLineRunner {
 
 	/*
 	registraduría :
@@ -32,43 +38,14 @@ public class RegistraduriaApplication {
 	static SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
 
 	public static void main(String[] args) throws ParseException {
+		SpringApplication.run(RegistraduriaApplication.class, args);
 
-		Scanner sc = new Scanner(System.in);
-
-		int opcion;
-
-		while (true) {
-			System.out.println("Menú Principal");
-			System.out.println("1. Registrar persona");
-			System.out.println("2. Actualizar documento");
-			System.out.println("3. Búsqueda de persona por documento");
-			System.out.println("4. Salir");
-			System.out.print("Seleccione una opción: ");
-
-			opcion = sc.nextInt();
-
-			switch (opcion) {
-				case 1:
-					registrarPersona();
-					break;
-				case 2:
-					actualizarDocumento();
-					break;
-				case 3:
-					buscarPersona();
-					break;
-				case 4:
-					System.out.println("Saliendo del programa...");
-					sc.close();
-					System.exit(0);
-				default:
-					System.out.println("Opción no válida. Por favor, seleccione una opción válida.");
-			}
-		}
 	}
 
 
-	public static void registrarPersona() {
+	@Autowired
+	RepositorioPersona repositorioPersona;
+	public  void registrarPersona() {
 
 		ctlPersona cPersona = new ctlPersona();
 		Utilidades utilidades = new Utilidades();
@@ -90,7 +67,7 @@ public class RegistraduriaApplication {
 		persona.setNumero_documento(utilidades.generarNumeroAleatorio());
 
 		if(validacionSavePersona()){
-			cPersona.savePersona(persona);
+			repositorioPersona.save(persona);
 			System.out.println("Registrando persona...");
 			System.out.println("Su numero de documento es " + persona.getNumero_documento());
 		}else{
@@ -122,7 +99,7 @@ public class RegistraduriaApplication {
 
 	public static void actualizarDocumento() throws ParseException {
 
-		LocalDate fechaActual = LocalDate.now();
+		/*LocalDate fechaActual = LocalDate.now();
 
 		ctlPersona cPersona = new ctlPersona();
 		Scanner sc2 = new Scanner(System.in);
@@ -200,7 +177,7 @@ public class RegistraduriaApplication {
 			}
 		}else{
 			System.out.println("No se encontro a la persona");
-		}
+		}*/
 	}
 
 	public static TipoDocumento documentoEspecifico(long id){
@@ -213,7 +190,7 @@ public class RegistraduriaApplication {
 	}
 
 	public static void buscarPersona() {
-		ctlPersona cPersona = new ctlPersona();
+		/*ctlPersona cPersona = new ctlPersona();
 
 		System.out.println("Personas Registradas \n");
 
@@ -233,9 +210,44 @@ public class RegistraduriaApplication {
             System.out.println("Tipo de documento: "+ documento.getId() + "." + documento.getNombre());
 			System.out.println("*****************************************************");
 
-		}
+		}*/
 	}
 
 
 
+	@Override
+	public void run(String... args) throws Exception {
+		Scanner sc = new Scanner(System.in);
+
+		int opcion;
+
+		while (true) {
+			System.out.println("Menú Principal");
+			System.out.println("1. Registrar persona");
+			System.out.println("2. Actualizar documento");
+			System.out.println("3. Búsqueda de persona por documento");
+			System.out.println("4. Salir");
+			System.out.print("Seleccione una opción: ");
+
+			opcion = sc.nextInt();
+
+			switch (opcion) {
+				case 1:
+					registrarPersona();
+					break;
+				case 2:
+					actualizarDocumento();
+					break;
+				case 3:
+					buscarPersona();
+					break;
+				case 4:
+					System.out.println("Saliendo del programa...");
+					sc.close();
+					System.exit(0);
+				default:
+					System.out.println("Opción no válida. Por favor, seleccione una opción válida.");
+			}
+		}
+	}
 }

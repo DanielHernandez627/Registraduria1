@@ -4,29 +4,35 @@ import com.arq.registraduria.entidades.Persona;
 import com.arq.registraduria.entidades.TipoDocumento;
 import com.arq.registraduria.repositorios.RepositorioPersona;
 import com.arq.registraduria.utilidades.Utilidades;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class servicioPersona implements RepositorioPersona, Serializable {
+
+@Service
+public class servicioPersona implements Serializable {
 
 
     Utilidades utilidades = new Utilidades();
     List<Persona> personaList = new ArrayList<>();
 
-    String nombreArchivo = "Personas";
 
-    @Override
+    @Autowired
+    RepositorioPersona repositorioPersona;
+
     public void SavePersona(Persona persona) {
-        String personaS = persona.toString();
-        Utilidades.generarArchivo(nombreArchivo,personaS);
+        repositorioPersona.save(persona);
     }
 
+    /*
     @Override
     public Persona getPersonaByDocumento(long numero_documento) {
         personaList = convertirRespuesta(utilidades.leerArchivo(nombreArchivo));
@@ -64,5 +70,5 @@ public class servicioPersona implements RepositorioPersona, Serializable {
             }
         }
         return entidades;
-    }
+    }*/
 }
