@@ -5,6 +5,7 @@ import com.arq.registraduria.controlador.ctlTDocumento;
 import com.arq.registraduria.entidades.Persona;
 import com.arq.registraduria.entidades.TipoDocumento;
 import com.arq.registraduria.repositorios.RepositorioPersona;
+import com.arq.registraduria.repositorios.RepositorioTDocumento;
 import com.arq.registraduria.utilidades.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -15,10 +16,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.time.Period;
 
 @SpringBootApplication
@@ -37,14 +36,53 @@ public class RegistraduriaApplication implements CommandLineRunner {
 
 	static SimpleDateFormat formatoFecha = new SimpleDateFormat("dd-MM-yyyy");
 
+	@Autowired
+	RepositorioPersona repositorioPersona;
+
+	@Autowired
+	RepositorioTDocumento repositorioTDocumento;
+
 	public static void main(String[] args) throws ParseException {
 		SpringApplication.run(RegistraduriaApplication.class, args);
 
 	}
 
+	@Override
+	public void run(String... args) throws Exception {
+		Scanner sc = new Scanner(System.in);
 
-	@Autowired
-	RepositorioPersona repositorioPersona;
+		int opcion;
+
+		while (true) {
+			System.out.println("Menú Principal");
+			System.out.println("1. Registrar persona");
+			System.out.println("2. Actualizar documento");
+			System.out.println("3. Búsqueda de persona por documento");
+			System.out.println("4. Salir");
+			System.out.print("Seleccione una opción: ");
+
+			opcion = sc.nextInt();
+
+			switch (opcion) {
+				case 1:
+					registrarPersona();
+					break;
+				case 2:
+					actualizarDocumento();
+					break;
+				case 3:
+					buscarPersona();
+					break;
+				case 4:
+					System.out.println("Saliendo del programa...");
+					sc.close();
+					System.exit(0);
+				default:
+					System.out.println("Opción no válida. Por favor, seleccione una opción válida.");
+			}
+		}
+	}
+
 	public  void registrarPersona() {
 
 		ctlPersona cPersona = new ctlPersona();
@@ -97,9 +135,9 @@ public class RegistraduriaApplication implements CommandLineRunner {
 		return ind;
 	}
 
-	public static void actualizarDocumento() throws ParseException {
+	public void actualizarDocumento() throws ParseException {
 
-		/*LocalDate fechaActual = LocalDate.now();
+		LocalDate fechaActual = LocalDate.now();
 
 		ctlPersona cPersona = new ctlPersona();
 		Scanner sc2 = new Scanner(System.in);
@@ -111,7 +149,8 @@ public class RegistraduriaApplication implements CommandLineRunner {
 		System.out.println("Digite el numero de documetno de la persona a editar: ");
 		numero_documento = sc2.nextLong();
 
-		Persona persona1 = cPersona.getPersonaByDocumento(numero_documento);
+		Optional<Persona> personaOptional = repositorioPersona.findById(numero_documento);
+		Persona persona1 = personaOptional.orElseThrow(() -> new NoSuchElementException("No se encontró ninguna persona"));
 
 		if (persona1 != null){
 			Date fecha = formatoFecha.parse(persona1.getFecha_Nacimiento());
@@ -141,7 +180,7 @@ public class RegistraduriaApplication implements CommandLineRunner {
 					while (id_documento_nuevo == 0) {
 						System.out.println("Seleccione el nuevo documento: ");
 
-						for (TipoDocumento documento1 : tdocumento.GetDocumentos()) {
+						for (TipoDocumento documento1 : repositorioTDocumento.findAll()) {
 							System.out.println(documento1.getId() + ". " + documento1.getNombre());
 						}
 
@@ -164,7 +203,7 @@ public class RegistraduriaApplication implements CommandLineRunner {
 						System.out.println("La edad actual no es válida para este tipo de documento CÉDULA");
 					}else{
 						System.out.println("Actualizando documento...");
-						cPersona.savePersona(persona1);
+						repositorioPersona.save(persona1);
 						System.out.println("Actualizacion exitosa");
 					}
 
@@ -177,11 +216,11 @@ public class RegistraduriaApplication implements CommandLineRunner {
 			}
 		}else{
 			System.out.println("No se encontro a la persona");
-		}*/
+		}
 	}
 
-	public static TipoDocumento documentoEspecifico(long id){
-		for (TipoDocumento documento : tdocumento.GetDocumentos()) {
+	public TipoDocumento documentoEspecifico(long id){
+		for (TipoDocumento documento : repositorioTDocumento.findAll()) {
 			if (documento.getId() == id){
 				return documento;
 			}
@@ -189,12 +228,10 @@ public class RegistraduriaApplication implements CommandLineRunner {
 		return  null;
 	}
 
-	public static void buscarPersona() {
-		/*ctlPersona cPersona = new ctlPersona();
-
+	public void buscarPersona() {
 		System.out.println("Personas Registradas \n");
 
-		List<Persona> personaList = cPersona.getAllPersonas();
+		List<Persona> personaList = repositorioPersona.findAll();
 
 		for (Persona persona1 : personaList){
 			System.out.println("*****************************************************");
@@ -210,44 +247,6 @@ public class RegistraduriaApplication implements CommandLineRunner {
             System.out.println("Tipo de documento: "+ documento.getId() + "." + documento.getNombre());
 			System.out.println("*****************************************************");
 
-		}*/
-	}
-
-
-
-	@Override
-	public void run(String... args) throws Exception {
-		Scanner sc = new Scanner(System.in);
-
-		int opcion;
-
-		while (true) {
-			System.out.println("Menú Principal");
-			System.out.println("1. Registrar persona");
-			System.out.println("2. Actualizar documento");
-			System.out.println("3. Búsqueda de persona por documento");
-			System.out.println("4. Salir");
-			System.out.print("Seleccione una opción: ");
-
-			opcion = sc.nextInt();
-
-			switch (opcion) {
-				case 1:
-					registrarPersona();
-					break;
-				case 2:
-					actualizarDocumento();
-					break;
-				case 3:
-					buscarPersona();
-					break;
-				case 4:
-					System.out.println("Saliendo del programa...");
-					sc.close();
-					System.exit(0);
-				default:
-					System.out.println("Opción no válida. Por favor, seleccione una opción válida.");
-			}
 		}
 	}
 }

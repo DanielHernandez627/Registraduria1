@@ -5,6 +5,8 @@ import com.arq.registraduria.repositorios.RepositorioTDocumento;
 import com.arq.registraduria.utilidades.Utilidades;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,29 +14,15 @@ import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class servicioTDocumento implements RepositorioTDocumento, Serializable {
+@Service
+public class servicioTDocumento {
 
     Utilidades utilidades = new Utilidades();
 
-    @Override
-    public List<TipoDocumento> getAllDocumentos() {
-        return convertirRespuesta(utilidades.leerArchivo("Documentos"));
-    }
+    @Autowired
+    RepositorioTDocumento repositorioTDocumento;
 
-    public static List<TipoDocumento> convertirRespuesta(String respuesta) {
-        List<TipoDocumento> entidades = new ArrayList<>();
-        String[] lineas = respuesta.split("\n");
-        for (String linea : lineas) {
-            String[] partes = linea.split(",");
-            if (partes.length == 3) {
-                long id = Long.parseLong(partes[0]);
-                String sigla = partes[1];
-                String nombre = partes[2];
-                entidades.add(new TipoDocumento(id, sigla, nombre));
-            } else {
-                System.out.println("Formato incorrecto en la línea: " + linea);
-            }
-        }
-        return entidades;
+    public List<TipoDocumento> getAllDocumentos() {
+        return repositorioTDocumento.findAll();
     }
 }
