@@ -44,12 +44,11 @@ public class RegistraduriaApplication implements CommandLineRunner {
 
 	public static void main(String[] args) throws ParseException {
 		SpringApplication.run(RegistraduriaApplication.class, args);
-
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		Scanner sc = new Scanner(System.in);
+		/*Scanner sc = new Scanner(System.in);
 
 		int opcion;
 
@@ -80,7 +79,7 @@ public class RegistraduriaApplication implements CommandLineRunner {
 				default:
 					System.out.println("Opción no válida. Por favor, seleccione una opción válida.");
 			}
-		}
+		}*/
 	}
 
 	public  void registrarPersona() {
