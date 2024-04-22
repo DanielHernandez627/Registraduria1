@@ -24,27 +24,31 @@ public class servicioPersona implements Serializable {
     Utilidades utilidades = new Utilidades();
     List<Persona> personaList = new ArrayList<>();
 
+    Persona persona;
+
 
     @Autowired
     RepositorioPersona repositorioPersona;
 
-    public void SavePersona(Persona persona) {
-        repositorioPersona.save(persona);
+    public boolean SavePersona(Persona persona) {
+        boolean state = false;
+        var registro = repositorioPersona.save(persona);
+        if (registro != null){
+            state = true;
+        }
+        return state;
+    }
+
+    public Persona getPersonaByDocumento(long numero_documento) {
+        persona = repositorioPersona.findPersonaByNumero_documento(numero_documento);
+
+        if (persona.getNumero_documento() == numero_documento){
+            return persona;
+        }
+        return null;
     }
 
     /*
-    @Override
-    public Persona getPersonaByDocumento(long numero_documento) {
-        personaList = convertirRespuesta(utilidades.leerArchivo(nombreArchivo));
-
-        for (Persona lista : personaList){
-            if (lista.getNumero_documento() == numero_documento){
-                return lista;
-            }
-        }
-
-        return null;
-    }
 
     @Override
     public List<Persona> getAllPersona() {

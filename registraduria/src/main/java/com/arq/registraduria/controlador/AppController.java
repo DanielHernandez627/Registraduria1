@@ -17,4 +17,8 @@ public class AppController {
         return "crear_personas";
     }
 
+    @GetMapping("/actualizar_persona")
+    public String ui_actualizar_personas(Model model){
+        return "actualizar_persona";
+    }
 }
