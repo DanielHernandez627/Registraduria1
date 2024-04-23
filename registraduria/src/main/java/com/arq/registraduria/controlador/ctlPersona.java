@@ -45,6 +45,8 @@ public class ctlPersona {
         return "redirect:/actualizar_persona";
     }
 
+
+
     /*
     public List<Persona> getAllPersonas(){
         return spersona.getAllPersona();
